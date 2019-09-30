@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/icon.ico</file>
+        <file>images/pointer-left.png</file>
+        <file>images/pointer-right.png</file>
+        <file>images/question.png</file>
+        <file>images/question-active.png</file>
+        <file>images/w-active-cloud.png</file>
+        <file>images/w-active-rain.png</file>
+        <file>images/w-active-rain-cloud.png</file>
+        <file>images/w-active-snow.png</file>
+        <file>images/w-active-snow-cloud.png</file>
+        <file>images/w-active-sun.png</file>
+        <file>images/w-active-sun-cloud.png</file>
+        <file>images/w-cloud.png</file>
+        <file>images/w-rain.png</file>
+        <file>images/w-rain-cloud.png</file>
+        <file>images/w-snow.png</file>
+        <file>images/w-snow-cloud.png</file>
+        <file>images/w-sun.png</file>
+        <file>images/w-sun-cloud.png</file>
+    </qresource>
+</RCC>
