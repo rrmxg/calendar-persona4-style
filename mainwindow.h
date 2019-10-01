@@ -11,7 +11,7 @@
 #define ORGANIZATION_DOMAIN "_domain_"
 #define APPLICATION_NAME    "calendarpersona"
 ///////////////////////////////////////////////////////////////////////////////
-#include "E:\PROJECTS\qt-accuweather\accuweather.h"
+#include "accuweather.h"
 ///////////////////////////////////////////////////////////////////////////////
 #include <QDialog>
 #include <QLineEdit>
@@ -26,7 +26,7 @@ const int LEFT_DAY  = -1;
 const int RIGHT_DAY = 1;
 const int ZERO      = 0;
 
-const QString APIKEY = "kxiyEWK1s4BeWGic7A86umQbOREWs4ws";
+const QString APIKEY = ;
 
 const QString CITY_NAME = "moscow";
 const QString CITY_KEY  = "city_name";

@@ -39,7 +39,7 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-include(E:\PROJECTS\qt-accuweather\accuweather.pri) # <---
+include($$PWD\accuweather.pri)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
