@@ -1,25 +1,25 @@
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include "mainwindow.h"
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QMouseEvent>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 
-void Mainwindow::mouseMoveEvent(QMouseEvent *event)
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons().testFlag(Qt::LeftButton))
     {
-        setGeometry(pos().x() + ( event->x() - g_position.dx),
-                    pos().y() + ( event->y() - g_position.dy),
+        setGeometry(pos().x() + ( event->x() - mw_position.dx),
+                    pos().y() + ( event->y() - mw_position.dy),
                     width(),
                     height());
     }
 }
 
-void Mainwindow::mousePressEvent(QMouseEvent *event)
+void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        g_position.dx = event->x();
-        g_position.dy = event->y();
+        mw_position.dx = event->x();
+        mw_position.dy = event->y();
     }
 }

@@ -1,17 +1,17 @@
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include "accuweather.h"
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QDebug>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QNetworkReply>
 #include <QEventLoop>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QPushButton>
 #include <QLabel>
 #include <QVBoxLayout>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 
 AccuWeather::~AccuWeather() { forecastData.clear(); }
 
@@ -67,7 +67,7 @@ void AccuWeather::getForecastDay()
 {
     forecastData.clear();
 
-    QJsonObject obj = doc.object();
+    QJsonObject obj = aw_doc.object();
     QJsonArray  arr = obj.value("DailyForecasts").toArray();
 
     ForecastData fd;
@@ -81,26 +81,25 @@ void AccuWeather::getForecastDay()
         fd.date = getDate(s);
 
         fd.temperatureMinF = value.toObject().value("Temperature")
-                                            .toObject().value("Minimum")
-                                            .toObject().value("Value")
-                                            .toInt();
+                                             .toObject().value("Minimum")
+                                             .toObject().value("Value")
+                                             .toInt();
         fd.temperatureMaxF = value.toObject().value("Temperature")
-                                            .toObject().value("Maximum")
-                                            .toObject().value("Value")
-                                            .toInt();
+                                             .toObject().value("Maximum")
+                                             .toObject().value("Value")
+                                             .toInt();
         fd.iconDayNo       = value.toObject().value("Day")
-                                            .toObject().value("Icon")
-                                            .toInt();
+                                             .toObject().value("Icon")
+                                             .toInt();
         fd.iconPhraseDay   = value.toObject().value("Day")
-                                            .toObject().value("IconPhrase")
-                                            .toString();
+                                             .toObject().value("IconPhrase")
+                                             .toString();
         fd.iconNightNo     = value.toObject().value("Night")
-                                            .toObject().value("Icon")
-                                            .toInt();
+                                             .toObject().value("Icon")
+                                             .toInt();
         fd.iconPhraseNight = value.toObject().value("Night")
-                                            .toObject().value("IconPhrase")
-                                            .toString();
-
+                                             .toObject().value("IconPhrase")
+                                             .toString();
         forecastData.push_back(fd);
     }
 }
@@ -109,7 +108,7 @@ void AccuWeather::getForecastHour()
 {
     forecastData.clear();
 
-    QJsonArray arr = doc.array();
+    QJsonArray arr = aw_doc.array();
 
     ForecastData fd;
 
@@ -123,15 +122,14 @@ void AccuWeather::getForecastHour()
         fd.time = getTime(s);
 
         fd.iconNo       = value.toObject().value("WeatherIcon")
-                                         .toInt();
+                                          .toInt();
         fd.iconPhrase   = value.toObject().value("IconPhrase")
-                                         .toString();
+                                          .toString();
         fd.isDayNight   = value.toObject().value("IsDaylight")
-                                         .toBool();
+                                          .toBool();
         fd.temperatureF = value.toObject().value("Temperature")
-                                         .toObject().value("Value")
-                                         .toInt();
-
+                                          .toObject().value("Value")
+                                          .toInt();
         forecastData.push_back(fd);
     }
 }
@@ -154,7 +152,7 @@ bool AccuWeather::getCountriesList(const QString cityName,
         return false;
     }
 
-    QJsonArray arr = doc.array();
+    QJsonArray arr = aw_doc.array();
 
     for (const QJsonValue value : arr)
     {
@@ -164,10 +162,9 @@ bool AccuWeather::getCountriesList(const QString cityName,
                                .toObject().value("LocalizedName")
                                .toString();
         QString administrativeArea
-                = value.toObject().value("AdministrativeArea")
-                       .toObject().value("LocalizedName")
-                       .toString();
-
+                        = value.toObject().value("AdministrativeArea")
+                               .toObject().value("LocalizedName")
+                               .toString();
         countries[country
                 + "("
                 + administrativeArea
@@ -213,7 +210,7 @@ void AccuWeather::getData(QString &url)
     if (reply->error())
         url = "error";
     else
-        doc = QJsonDocument::fromJson(reply->readAll());
+        aw_doc = QJsonDocument::fromJson(reply->readAll());
 
     reply->deleteLater();
 }

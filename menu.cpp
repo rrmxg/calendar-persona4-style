@@ -1,19 +1,19 @@
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include "mainwindow.h"
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QDesktopServices>
 #include <QContextMenuEvent>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 
-void Mainwindow::contextMenuEvent(QContextMenuEvent *event)
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
-    g_pMenu->exec(event->globalPos());
+    mw_pMenu->exec(event->globalPos());
 }
 
-void Mainwindow::menuAction(QAction *action)
+void MainWindow::menuAction(QAction *action)
 {
     QString str = action->text().remove("&");
 
@@ -29,7 +29,7 @@ void Mainwindow::menuAction(QAction *action)
                            "Space - current date          ");
 
     if (str == "City name")
-        g_pDialog->exec();
+        mw_pDialog->exec();
 
     if (str == "Accuweather")
         QDesktopServices::openUrl(QUrl("https://www.accuweather.com"));

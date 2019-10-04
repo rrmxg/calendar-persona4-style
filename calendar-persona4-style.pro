@@ -23,21 +23,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++11
+CONFIG  += c++11
 
-SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-        key.cpp \
-        menu.cpp \
-        mouse.cpp \
-        timer.cpp
+SOURCES += main.cpp
+SOURCES += mainwindow.cpp
+SOURCES += key.cpp
+SOURCES += menu.cpp
+SOURCES += mouse.cpp
+SOURCES += timer.cpp
 
-HEADERS += \
-        mainwindow.h
+HEADERS += mainwindow.h
 
-FORMS += \
-        mainwindow.ui
+FORMS   += mainwindow.ui
 
 include($$PWD\accuweather.pri)
 
@@ -46,7 +43,6 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    resources.qrc
+RESOURCES += resources.qrc
 
 win32: RC_ICONS = $$PWD/icons/icon.ico

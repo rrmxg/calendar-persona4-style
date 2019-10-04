@@ -1,59 +1,59 @@
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QRegExpValidator>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QDebug>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 
-Mainwindow::Mainwindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QDialog(parent, Qt::Window | Qt::FramelessWindowHint),
-    ui(new Ui::Mainwindow)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
     // SET PIXMAPS
     {
-        g_pixmapWeather[0].w
+        mw_pixmapWeather[0].w
                 .convertFromImage(QImage(":/images/w-sun.png"       ));
-        g_pixmapWeather[1].w
+        mw_pixmapWeather[1].w
                 .convertFromImage(QImage(":/images/w-sun-cloud.png" ));
-        g_pixmapWeather[2].w
+        mw_pixmapWeather[2].w
                 .convertFromImage(QImage(":/images/w-cloud.png"     ));
-        g_pixmapWeather[3].w
+        mw_pixmapWeather[3].w
                 .convertFromImage(QImage(":/images/w-rain.png"      ));
-        g_pixmapWeather[4].w
+        mw_pixmapWeather[4].w
                 .convertFromImage(QImage(":/images/w-rain-cloud.png"));
-        g_pixmapWeather[5].w
+        mw_pixmapWeather[5].w
                 .convertFromImage(QImage(":/images/w-snow.png"      ));
-        g_pixmapWeather[6].w
+        mw_pixmapWeather[6].w
                 .convertFromImage(QImage(":/images/w-snow-cloud.png"));
 
-        g_pixmapWeather[0].wActive
+        mw_pixmapWeather[0].wActive
                 .convertFromImage(QImage(":/images/w-active-sun.png"       ));
-        g_pixmapWeather[1].wActive
+        mw_pixmapWeather[1].wActive
                 .convertFromImage(QImage(":/images/w-active-sun-cloud.png" ));
-        g_pixmapWeather[2].wActive
+        mw_pixmapWeather[2].wActive
                 .convertFromImage(QImage(":/images/w-active-cloud.png"     ));
-        g_pixmapWeather[3].wActive
+        mw_pixmapWeather[3].wActive
                 .convertFromImage(QImage(":/images/w-active-rain.png"      ));
-        g_pixmapWeather[4].wActive
+        mw_pixmapWeather[4].wActive
                 .convertFromImage(QImage(":/images/w-active-rain-cloud.png"));
-        g_pixmapWeather[5].wActive
+        mw_pixmapWeather[5].wActive
                 .convertFromImage(QImage(":/images/w-active-snow.png"      ));
-        g_pixmapWeather[6].wActive
+        mw_pixmapWeather[6].wActive
                 .convertFromImage(QImage(":/images/w-active-snow-cloud.png"));
 
-        g_pixmapOther.question
+        mw_pixmapOther.question
                 .convertFromImage(QImage(":/images/question.png"       ));
-        g_pixmapOther.questionActive
+        mw_pixmapOther.questionActive
                 .convertFromImage(QImage(":/images/question-active.png"));
-        g_pixmapOther.pointerLeft
+        mw_pixmapOther.pointerLeft
                 .convertFromImage(QImage(":/images/pointer-left.png"   ));
-        g_pixmapOther.pointerRight
+        mw_pixmapOther.pointerRight
                 .convertFromImage(QImage(":/images/pointer-right.png"  ));
     }
 
@@ -61,82 +61,80 @@ Mainwindow::Mainwindow(QWidget *parent) :
     {
         ui->label_horizontal->setStyleSheet(BLACK_BACKGROUND);
 
-        ui->scrollArea->setStyleSheet("background-color: transparent;");
-        ui->scrollArea->setFocusPolicy(Qt::NoFocus);
+//        ui->scrollArea->setStyleSheet("background-color: transparent;");
+//        ui->scrollArea->setFocusPolicy(Qt::NoFocus);
 
-        g_date = QDate::currentDate();
-        g_hour = QTime::currentTime().hour();
+        mw_date = QDate::currentDate();
+        mw_hour = QTime::currentTime().hour();
 
-        g_countDay = 0;
+        mw_countDay = 0;
     }
 
-    g_pSettings = new QSettings(ORGANIZATION_NAME, APPLICATION_NAME, this);
+    mw_pSettings = new QSettings(ORGANIZATION_NAME, APPLICATION_NAME, this);
     {
-        g_cityName = g_pSettings->value(CITY_KEY, CITY_NAME).toString();
+        mw_cityName = mw_pSettings->value(CITY_KEY, CITY_NAME).toString();
 
-        ui->label_cityName->setText(g_cityName);
+        ui->label_cityName->setText(mw_cityName);
 
-        g_countryArea = g_pSettings->value(COUNTRY_KEY, COUNTRY_NAME).toString();
+        mw_countryArea = mw_pSettings->value
+                (COUNTRY_KEY, COUNTRY_NAME).toString();
 
-        g_accuweatherFiveDays.setApiKey(APIKEY);
-        g_accuweatherOneHour .setApiKey(APIKEY);
+        mw_accuweatherFiveDays.setApiKey(APIKEY);
+        mw_accuweatherOneHour .setApiKey(APIKEY);
 
-        if (g_accuweatherOneHour.getCountriesList(g_cityName, g_countries))
+        if (mw_accuweatherOneHour.getCountriesList(mw_cityName, mw_countries))
         {
-            g_locationKey = g_countries.find(g_countryArea).value();
+            mw_locationKey = mw_countries.find(mw_countryArea).value();
         }
 
-        // UPDATE SCROLL AREA
+        // SET POSITION PREFABS
         {
-            QWidget *widget        = new QWidget    (this);
-            QHBoxLayout *horLayout = new QHBoxLayout(this);
-            {
-                horLayout->setSpacing(24);
-            }
+            updatePrefabs();
 
-            updateScrollArea();
-
-            for (int i = 0; i < 13; i++)
+            for (int i = 0; i < 11; i++)
             {
-                QVBoxLayout *verLayout = new QVBoxLayout(this);
                 {
-                    verLayout->addWidget(&g_prefab[i].dayOfWeek);
-                    verLayout->addWidget(&g_prefab[i].date     );
-                    verLayout->addWidget(&g_prefab[i].weather  );
-
-                    verLayout->setSpacing(0);
+                    mw_prefab[i].dayOfWeek.setParent(ui->parent);
+                    mw_prefab[i].dayOfWeek.setGeometry
+                            (prefabX[i], prefabY[0], 60, 20);
+                    mw_prefab[i].dayOfWeek.show();
                 }
-                horLayout->addLayout(verLayout, i);
+                {
+                    mw_prefab[i].date.setParent(ui->parent);
+                    mw_prefab[i].date.setGeometry
+                            (prefabX[i], prefabY[1], 60, 20);
+                    mw_prefab[i].date.show();
+                }
+                {
+                    mw_prefab[i].weather.setParent(ui->parent);
+                    mw_prefab[i].weather.setGeometry
+                            (prefabX[i], prefabY[2], 60, 20);
+                    mw_prefab[i].weather.show();
+                }
             }
-            widget->setLayout(horLayout);
-
-            ui->scrollArea->setWidget    (widget        );
-            ui->scrollArea->show         (              );
-            ui->scrollArea->ensureVisible(981, 0, 50, 50); // middle date
         }
-
         updateForecastOneHour ();
         updateForecastFiveDays();
     }
 
-    g_pMenu = new QMenu(this);
+    mw_pMenu = new QMenu(this);
     {
-        g_pMenu->addAction("&Accuweather");
-        g_pMenu->addAction("&City name");
-        g_pMenu->addAction("&Readme");
-        g_pMenu->addAction("&Exit");
+        mw_pMenu->addAction("&Accuweather");
+        mw_pMenu->addAction("&City name");
+        mw_pMenu->addAction("&Readme");
+        mw_pMenu->addAction("&Exit");
 
-        connect(g_pMenu, SIGNAL(triggered (QAction*)),
+        connect(mw_pMenu, SIGNAL(triggered (QAction*)),
                 this,    SLOT  (menuAction(QAction*)));
     }
 
-    g_pDialog = new QDialog(this);
+    mw_pDialog = new QDialog(this);
     {
-        QVBoxLayout *verLayout = new QVBoxLayout(g_pDialog);
+        QVBoxLayout *verLayout = new QVBoxLayout(mw_pDialog);
         {
-            QHBoxLayout *horLayoutUp = new QHBoxLayout(g_pDialog);
+            QHBoxLayout *horLayoutUp = new QHBoxLayout(mw_pDialog);
             {
-                QLabel *label_cityName = new QLabel(g_pDialog);
+                QLabel *label_cityName = new QLabel(mw_pDialog);
                 {
                     label_cityName->setText("City name");
 
@@ -145,19 +143,19 @@ Mainwindow::Mainwindow(QWidget *parent) :
                 }
                 horLayoutUp->addWidget(label_cityName);
 
-                g_pLineEdit = new QLineEdit(g_pDialog);
+                mw_pLineEdit = new QLineEdit(mw_pDialog);
                 {
-                    g_pLineEdit->setValidator
+                    mw_pLineEdit->setValidator
                             (new QRegExpValidator(QRegExp("[a-z]{0,}")));
 
-                    g_pLineEdit->setPlaceholderText("example: moscow");
+                    mw_pLineEdit->setPlaceholderText("example: moscow");
 
-                    g_pLineEdit->setMinimumSize(300, 20);
-                    g_pLineEdit->setMaximumSize(300, 20);
+                    mw_pLineEdit->setMinimumSize(300, 20);
+                    mw_pLineEdit->setMaximumSize(300, 20);
                 }
-                horLayoutUp->addWidget(g_pLineEdit);
+                horLayoutUp->addWidget(mw_pLineEdit);
 
-                QPushButton *buttonSearch = new QPushButton(g_pDialog);
+                QPushButton *buttonSearch = new QPushButton(mw_pDialog);
                 {
                     buttonSearch->setText("Search");
 
@@ -166,19 +164,19 @@ Mainwindow::Mainwindow(QWidget *parent) :
 
                     connect(buttonSearch, &QPushButton::clicked, [this]()
                     {
-                        if (g_pLineEdit->text().isEmpty())
+                        if (mw_pLineEdit->text().isEmpty())
                             return;
 
-                        g_countries.clear();
+                        mw_countries.clear();
 
-                        g_cityName = g_pLineEdit->text();
-                        ui->label_cityName->setText(g_cityName);
-                        g_pSettings->setValue(CITY_KEY, g_cityName);
+                        mw_cityName = mw_pLineEdit->text();
+                        ui->label_cityName->setText(mw_cityName);
+                        mw_pSettings->setValue(CITY_KEY, mw_cityName);
 
-                        if (g_accuweatherOneHour
-                                .getCountriesList(g_cityName, g_countries))
+                        if (mw_accuweatherOneHour
+                                .getCountriesList(mw_cityName, mw_countries))
                         {
-                            g_pComboBox->addItems(g_countries.keys());
+                            mw_pComboBox->addItems(mw_countries.keys());
 
                         }
                     });
@@ -187,9 +185,9 @@ Mainwindow::Mainwindow(QWidget *parent) :
             }
             verLayout->addLayout(horLayoutUp);
 
-            QHBoxLayout *horLayoutDown = new QHBoxLayout(g_pDialog);
+            QHBoxLayout *horLayoutDown = new QHBoxLayout(mw_pDialog);
             {
-                QLabel *label_counties = new QLabel(g_pDialog);
+                QLabel *label_counties = new QLabel(mw_pDialog);
                 {
                     label_counties->setText("Countries");
 
@@ -198,170 +196,186 @@ Mainwindow::Mainwindow(QWidget *parent) :
                 }
                 horLayoutDown->addWidget(label_counties);
 
-                g_pComboBox = new QComboBox(g_pDialog);
-                horLayoutDown->addWidget(g_pComboBox);
+                mw_pComboBox = new QComboBox(mw_pDialog);
+                horLayoutDown->addWidget(mw_pComboBox);
             }
             verLayout->addLayout(horLayoutDown);
 
-            QPushButton *buttonOk = new QPushButton(g_pDialog);
+            QPushButton *buttonOk = new QPushButton(mw_pDialog);
             {
                 buttonOk->setText("OK");
 
                 connect(buttonOk, &QPushButton::clicked, [this]()
                 {
-                    if (g_pLineEdit->text().isEmpty() || g_countries.isEmpty())
+                    if (mw_pLineEdit->text().isEmpty() || mw_countries.isEmpty())
                         return;
 
-                    g_countryArea = g_pComboBox->currentText();
-                    g_pSettings->setValue(COUNTRY_KEY, g_countryArea);
+                    mw_countryArea = mw_pComboBox->currentText();
+                    mw_pSettings->setValue(COUNTRY_KEY, mw_countryArea);
 
-                    g_locationKey = g_countries.find(g_countryArea).value();
+                    mw_locationKey = mw_countries.find(mw_countryArea).value();
 
                     updateForecastOneHour ();
                     updateForecastFiveDays();
 
-                    g_pDialog->close();
+                    mw_pDialog->close();
                 });
             }
             verLayout->addWidget(buttonOk);
         }
-        g_pDialog->setLayout(verLayout);
-        g_pDialog->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        mw_pDialog->setLayout(verLayout);
+        mw_pDialog->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     }
 
     ui->label_dateMonth->setText(QString::number(QDate::currentDate().month()));
-    ui->label_dateYear->setText(QString::number(QDate::currentDate().year()));
+    ui->label_dateYear ->setText(QString::number(QDate::currentDate().year ()));
 
-    g_timer = startTimer(10000);
+    // TIMERS
+    {
+        mw_timer = startTimer(10000);
+
+        mw_countAnimation = 0;
+
+        mw_isKey = true;
+    }
 }
 
-Mainwindow::~Mainwindow()
+MainWindow::~MainWindow()
 {
-    killTimer(g_timer);
+    killTimer(mw_timer);
 
-    g_countries.clear();
+    mw_countries.clear();
 
     delete ui;
 }
 
-void Mainwindow::updateTime()
+void MainWindow::updateTime()
 {
     ui->label_currentTime->setText(QTime::currentTime().toString("hh:mm"));
 
     ui->label_dateMonth->setText(QString::number(QDate::currentDate().month()));
-    ui->label_dateYear->setText(QString::number(QDate::currentDate().year()));
+    ui->label_dateYear ->setText(QString::number(QDate::currentDate().year ()));
 
     if (QTime::currentTime().toString() == "00:01:000")
     {
         updateForecastFiveDays();
     }
 
-    if (QTime::currentTime().hour() != g_hour)
+    if (QTime::currentTime().hour() != mw_hour)
     {
         updateForecastOneHour();
     }
 }
 
-void Mainwindow::updateForecastFiveDays()
+void MainWindow::updateForecastFiveDays()
 {
-    if (g_countries.isEmpty())
+    if (mw_countries.isEmpty())
         return;
 
-    if (g_accuweatherFiveDays.getForecast(g_locationKey, FORECASTS_DAYS[1]))
+    if (mw_accuweatherFiveDays.getForecast(mw_locationKey, FORECASTS_DAYS[1]))
     {
-        updateScrollArea();
+        updatePrefabs();
 
         ui->label_temperatureDay->setText
-                (QString::number(g_accuweatherFiveDays
+                (QString::number(mw_accuweatherFiveDays
                                  .forecastData[0].temperatureMaxC()) + "°");
 
         ui->label_temperatureNight->setText
-                (QString::number(g_accuweatherFiveDays
+                (QString::number(mw_accuweatherFiveDays
                                  .forecastData[0].temperatureMinC()) + "°");
     }
 }
 
-void Mainwindow::updateForecastOneHour()
+void MainWindow::updateForecastOneHour()
 {
-    if (g_countries.isEmpty())
+    if (mw_countries.isEmpty())
         return;
 
-    if (g_accuweatherOneHour.getForecast(g_locationKey, FORECASTS_HOURS[0]))
+    if (mw_accuweatherOneHour.getForecast(mw_locationKey, FORECASTS_HOURS[0]))
     {
         ui->label_temperatureNow->setText
-                (QString::number(g_accuweatherOneHour
+                (QString::number(mw_accuweatherOneHour
                                  .forecastData[0].temperatureC()) + "°");
 
-        g_hour = QTime::currentTime().hour();
+        mw_hour = QTime::currentTime().hour();
     }
 }
 
-void Mainwindow::updatesAfterClicking(const int i)
+void MainWindow::updatesAfterClicking(const int i)
 {
+    // ANIMATION START
+    {
+        mw_directionMovement = i * LEFT_DAY;
+
+        mw_isKey = false;
+
+        mw_timerAnimation = startTimer(10);
+    }
+
     if (i == 0)
     {
-        g_date     = g_date.currentDate();
-        g_countDay = 0;
+        mw_date     = mw_date.currentDate();
+        mw_countDay = 0;
     }
     else
     {
-        g_date      = g_date.addDays(i);
-        g_countDay += i;
+        mw_date      = mw_date.addDays(i);
+        mw_countDay += i;
     }
 
     // label change date
     {
-        if (g_countDay == 0)
+        if (mw_countDay == 0)
             ui->label_counter->setText(" ");
 
-        if (g_countDay == 1)
+        if (mw_countDay == 1)
             ui->label_counter->setText("Tomorrow");
 
-        if (g_countDay == -1)
+        if (mw_countDay == -1)
             ui->label_counter->setText("Yesterday");
 
-        if (g_countDay > 1)
+        if (mw_countDay > 1)
             ui->label_counter->setText("After "
-                                           + QString::number(g_countDay)
+                                           + QString::number(mw_countDay)
                                            + " days");
 
-        if (g_countDay < -1)
-            ui->label_counter->setText(QString::number(g_countDay * -1)
+        if (mw_countDay < -1)
+            ui->label_counter->setText(QString::number(mw_countDay * -1)
                                            + " days ago");
     }
 
     // label pointer & horizontal
     {
-        if (g_countDay == 0)
+        if (mw_countDay == 0)
         {
-            ui->label_pointer   ->setPixmap(g_pixmapOther.empty);
+            ui->label_pointer   ->setPixmap(mw_pixmapOther.empty);
             ui->label_horizontal->setStyleSheet(BLACK_BACKGROUND);
         }
 
-        if (g_countDay > 0)
+        if (mw_countDay > 0)
         {
-            ui->label_pointer   ->setPixmap(g_pixmapOther.pointerRight);
+            ui->label_pointer   ->setPixmap(mw_pixmapOther.pointerRight);
             ui->label_horizontal->setStyleSheet(YELLOW_BACKGROUND);
         }
 
-        if (g_countDay < 0)
+        if (mw_countDay < 0)
         {
-            ui->label_pointer   ->setPixmap(g_pixmapOther.pointerLeft);
+            ui->label_pointer   ->setPixmap(mw_pixmapOther.pointerLeft);
             ui->label_horizontal->setStyleSheet(YELLOW_BACKGROUND);
         }
     }
 
     // label date year & month
     {
-        ui->label_dateYear ->setNum(g_date.year ());
-        ui->label_dateMonth->setNum(g_date.month());
+        ui->label_dateYear ->setNum(mw_date.year ());
+        ui->label_dateMonth->setNum(mw_date.month());
     }
 
     // label day & night temperatures
     {
-        ForecastData fd = g_accuweatherFiveDays.searchForecast(g_date);
+        ForecastData fd = mw_accuweatherFiveDays.searchForecast(mw_date);
 
-        qDebug() << g_date;
+//        qDebug() << mw_date;
 
         ui->label_temperatureDay  ->setText
                 (QString::number(fd.temperatureMaxC()));
@@ -369,61 +383,64 @@ void Mainwindow::updatesAfterClicking(const int i)
                 (QString::number(fd.temperatureMinC()));
     }
 
-    updateScrollArea();
+//    updatePrefabs();
 }
 
-void Mainwindow::updateScrollArea()
+void MainWindow::updatePrefabs()
 {
     QString str;
     QDate   d;
 
-    for (int i = 0, j = -6; i < 13; i++, j++)
+    for (int i = 0, j = -3; i < 11; i++, j++)
     {
-        d = g_date.currentDate().addDays(j + g_countDay);
+        d = mw_date.currentDate().addDays(j + mw_countDay);
         {
             str = QLocale().dayName(d.dayOfWeek());
             str.resize(3);
 
-            g_prefab[i].dayOfWeek.setText      (str.toUpper());
-            g_prefab[i].dayOfWeek.setFixedSize (60, 20);
-            g_prefab[i].dayOfWeek.setAlignment (Qt::AlignCenter);
+            mw_prefab[i].dayOfWeek.setText     (str.toUpper());
+            mw_prefab[i].dayOfWeek.setFixedSize(60, 20);
+            mw_prefab[i].dayOfWeek.setAlignment(Qt::AlignCenter);
         }
         {
-            g_prefab[i].date.setText      (QString::number(d.day()));
-            g_prefab[i].date.setFixedSize (60, 20);
-            g_prefab[i].date.setAlignment (Qt::AlignCenter);
+            mw_prefab[i].date.setText     (QString::number(d.day()));
+            mw_prefab[i].date.setFixedSize(60, 20);
+            mw_prefab[i].date.setAlignment(Qt::AlignCenter);
         }
         {
-            g_prefab[i].weather.setScaledContents(true);
-            g_prefab[i].weather.setFixedSize     (60, 60);
+            mw_prefab[i].weather.setScaledContents(true);
+            mw_prefab[i].weather.setFixedSize     (60, 60);
         }
 
         if (j == 0)
         {
-            g_prefab[i].dayOfWeek.setStyleSheet(BLUE_TEXT);
-            g_prefab[i].date     .setStyleSheet(BLUE_TEXT);
-            g_prefab[i].weather  .setPixmap    (updatePixmap(d, true));
+            mw_prefab[i].dayOfWeek.setStyleSheet(BLUE_TEXT);
+            mw_prefab[i].date     .setStyleSheet(BLUE_TEXT);
+            mw_prefab[i].weather  .setPixmap    (updatePixmap(d, true));
         }
         else
         {
-            g_prefab[i].dayOfWeek.setStyleSheet(WHITE_TEXT);
-            g_prefab[i].date     .setStyleSheet(WHITE_TEXT);
-            g_prefab[i].weather  .setPixmap    (updatePixmap(d, false));
+            mw_prefab[i].dayOfWeek.setStyleSheet(WHITE_TEXT);
+            mw_prefab[i].date     .setStyleSheet(WHITE_TEXT);
+            mw_prefab[i].weather  .setPixmap    (updatePixmap(d, false));
         }
+//        qDebug() << i << " " << j << " " << d;
     }
 }
 
-QPixmap Mainwindow::updatePixmap(const QDate d, const bool b)
+QPixmap MainWindow::updatePixmap(const QDate d, const bool b)
 {
-    if (g_accuweatherFiveDays.forecastData.isEmpty())
+//    return mw_pixmapOther.question; // TEST
+
+    if (mw_accuweatherFiveDays.forecastData.isEmpty())
     {
-        return (b) ? g_pixmapOther.questionActive
-                   : g_pixmapOther.question;
+        return (b) ? mw_pixmapOther.questionActive
+                   : mw_pixmapOther.question;
     }
 
     int iconNo{};
 
-    ForecastData fd = g_accuweatherFiveDays.searchForecast(d);
+    ForecastData fd = mw_accuweatherFiveDays.searchForecast(d);
 
     iconNo = (QTime::currentTime().hour() > 18 ||
               QTime::currentTime().hour() < 6)
@@ -442,15 +459,15 @@ QPixmap Mainwindow::updatePixmap(const QDate d, const bool b)
          iconNo == 24                 ||
         (iconNo >= 30 && iconNo <= 36))
     {
-        return (b) ? g_pixmapWeather[0].wActive
-                   : g_pixmapWeather[0].w;
+        return (b) ? mw_pixmapWeather[0].wActive
+                   : mw_pixmapWeather[0].w;
     }
 
     if (iconNo == 5 ||
         iconNo == 6)
     {
-        return (b) ? g_pixmapWeather[1].wActive
-                   : g_pixmapWeather[1].w;
+        return (b) ? mw_pixmapWeather[1].wActive
+                   : mw_pixmapWeather[1].w;
     }
 
     if (iconNo == 7  ||
@@ -459,16 +476,16 @@ QPixmap Mainwindow::updatePixmap(const QDate d, const bool b)
         iconNo == 37 ||
         iconNo == 38)
     {
-        return (b) ? g_pixmapWeather[2].wActive
-                   : g_pixmapWeather[2].w;
+        return (b) ? mw_pixmapWeather[2].wActive
+                   : mw_pixmapWeather[2].w;
     }
 
     if (iconNo == 12 ||
        (iconNo >= 15 && iconNo <= 21) ||
        (iconNo >= 41 && iconNo <= 43))
     {
-        return (b) ? g_pixmapWeather[3].wActive
-                   : g_pixmapWeather[3].w;
+        return (b) ? mw_pixmapWeather[3].wActive
+                   : mw_pixmapWeather[3].w;
     }
 
     if (iconNo == 13 ||
@@ -476,8 +493,8 @@ QPixmap Mainwindow::updatePixmap(const QDate d, const bool b)
         iconNo == 39 ||
         iconNo == 40)
     {
-        return (b) ? g_pixmapWeather[4].wActive
-                   : g_pixmapWeather[4].w;
+        return (b) ? mw_pixmapWeather[4].wActive
+                   : mw_pixmapWeather[4].w;
     }
 
     if (iconNo == 22 ||
@@ -485,17 +502,17 @@ QPixmap Mainwindow::updatePixmap(const QDate d, const bool b)
         iconNo == 26 ||
         iconNo == 29)
     {
-        return (b) ? g_pixmapWeather[5].wActive
-                   : g_pixmapWeather[5].w;
+        return (b) ? mw_pixmapWeather[5].wActive
+                   : mw_pixmapWeather[5].w;
     }
 
     if (iconNo == 23 ||
         iconNo == 44)
     {
-        return (b) ? g_pixmapWeather[6].wActive
-                   : g_pixmapWeather[6].w;
+        return (b) ? mw_pixmapWeather[6].wActive
+                   : mw_pixmapWeather[6].w;
     }
 
-    return (b) ? g_pixmapOther.questionActive
-               : g_pixmapOther.question;
+    return (b) ? mw_pixmapOther.questionActive
+               : mw_pixmapOther.question;
 }

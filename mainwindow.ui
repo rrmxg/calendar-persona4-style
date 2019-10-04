@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Mainwindow</class>
- <widget class="QDialog" name="Mainwindow">
+ <class>MainWindow</class>
+ <widget class="QDialog" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -360,37 +360,27 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QScrollArea" name="scrollArea">
+  <widget class="QLabel" name="parent">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>241</y>
+     <y>0</y>
      <width>640</width>
-     <height>120</height>
+     <height>360</height>
     </rect>
    </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
+   <property name="minimumSize">
+    <size>
+     <width>640</width>
+     <height>360</height>
+    </size>
    </property>
-   <property name="verticalScrollBarPolicy">
-    <enum>Qt::ScrollBarAlwaysOff</enum>
+   <property name="maximumSize">
+    <size>
+     <width>640</width>
+     <height>360</height>
+    </size>
    </property>
-   <property name="horizontalScrollBarPolicy">
-    <enum>Qt::ScrollBarAlwaysOff</enum>
-   </property>
-   <property name="widgetResizable">
-    <bool>true</bool>
-   </property>
-   <widget class="QWidget" name="scrollAreaWidgetContents">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>640</width>
-      <height>120</height>
-     </rect>
-    </property>
-   </widget>
   </widget>
   <zorder>background</zorder>
   <zorder>label_horizontal</zorder>
@@ -406,8 +396,8 @@
   <zorder>temperatureNow</zorder>
   <zorder>label_cityName</zorder>
   <zorder>label_counter</zorder>
-  <zorder>scrollArea</zorder>
   <zorder>label_pointer</zorder>
+  <zorder>parent</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
